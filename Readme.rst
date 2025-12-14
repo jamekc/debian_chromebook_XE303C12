@@ -2,10 +2,9 @@ Installing Debian on an ARM Chromebook (XE303C12)
 #################################################
 
 
-:date: 2018-02-25 14:00
-:modified: 2023-11-17 10:00
 :tags: debian, arm, chromebook
 :authors: Pascal Geiser
+:modifier: Jamekc
 :summary: Debian installation on Samsung's ARM chromebook.
 
 .. contents::
@@ -63,7 +62,7 @@ Once developer mode is enabled, it's possible to enable USB boot:
 * Once chrome is ready, press CTRL-Alt-F2
 * Log as `chronos` with no password.
 * su - # Should give you root access.
-* Enable usb boot with: crossystem dev_boot_usb=1 dev_boot_signed_only=0
+* Enable usb boot with::	crossystem dev_boot_usb=1 dev_boot_signed_only=0
 
 For more, look here:
  * Chrome documentation: https://chromium.googlesource.com/chromiumos/docs/+/HEAD/developer_mode.md
@@ -88,9 +87,9 @@ Once the USB key is ready, plug it in the **black** usb connector (ie USB 2.0) o
 the chromebook . Start the machine and press ctrl-u (assuming you've already configured the
 developer mode). Wait for the system to boot.
 
-user: root
+user::	root
 
-passwd: toor
+passwd::	toor
 
 To install on the local emmc drive, run as root (from the USB key):
 
@@ -113,14 +112,57 @@ user: root
 
 passwd: toor
 
-Setup a network connection:
+Setup a network connection::
+
 `nmtui`
+
+Note: Before running the XFCE installation script, make sure the system clock is correct.
+Set your timezone with: `timedatectl set-timezone America/Santo_Domingo`
+It is also recommended to install `ntpsec` and enable NTP to keep the time synchronized:
+Example: `apt-get install ntpsec` and then `timedatectl set-ntp true`
 
 Run the provided XFCE installation script::
 
 	./xfce_install.sh
 
 Wait for the installation to finish and `poweroff` before jumping in your prefered desktop (with power-on and ctrl-d).
+
+Post‑Install XFCE
+*****************
+
+After installing and booting into XFCE, you may want to extend the system with Pi‑Apps,
+a graphical app store originally developed for Raspberry Pi OS but compatible with Debian.
+
+To install Pi‑Apps:
+
+1. Download the installer script::
+
+	wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
+
+2. Once finished, Pi‑Apps will appear in your XFCE menu under Accessories.
+
+Note 1: Pi‑Apps provides easy installation of popular software (VS Code, Arduino IDE, Minecraft Pi, etc.)
+It is optional, but recommended if you want a simple way to add applications to your XFCE desktop.
+
+Note 2: If you encounter a "source.list missing" error during Pi‑Apps installation,
+open and modify /etc/apt/sources.list with nano::
+
+	sudo nano /etc/apt/sources.list
+
+Then create a basic sources.list file for Debian Trixie::
+
+	deb     http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
+	deb-src http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
+
+	deb     http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+	deb-src http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+
+	deb     http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
+	deb-src http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
+
+Save the file in nano (Ctrl+O, Enter) and exit (Ctrl+X).
+Finally, run `sudo apt-get update` before retrying the Pi‑Apps installer.
+
 
 Kernel upgrade
 **************
